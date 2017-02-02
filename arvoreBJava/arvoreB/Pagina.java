@@ -32,9 +32,9 @@ public class Pagina {
     // ordem d =168 sendo minimo = d e maximo 2d
     //tamanho maximo de uma pagina seguindo esses calculos 4076
 
-    public void escrevePagina(RandomAccessFile file, Pagina p,int ordem){
+    public static void escrevePagina(RandomAccessFile file, Pagina p,int ordem){
         try {
-            file.seek(file.length());//attualizar
+            file.seek(p.getOffsetPag());
             file.writeLong(p.getOffsetPag());
             file.writeLong(p.getOffsetPai());
             file.writeInt(p.getTamanho());
@@ -49,7 +49,7 @@ public class Pagina {
             e.printStackTrace();
         }
     }
-    public Pagina lePagina(long offset, RandomAccessFile file, int tamanhoPagBytes,int ordem){
+    public static Pagina lePagina(long offset, RandomAccessFile file,int ordem){
         Pagina p = new Pagina(ordem);
         try {
             file.seek(offset);
