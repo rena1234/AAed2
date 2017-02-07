@@ -61,7 +61,7 @@ public class Pagina {
                 p.setChave(file.readInt(),i);
             }
             for(int i = 0;i<(2*ordem) +2;i++){
-                p.setOffset(file.readInt(),i);
+                p.setOffset(file.readLong(),i);
             }
         } catch (IOException e) {
             e.printStackTrace();
