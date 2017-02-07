@@ -12,8 +12,10 @@ public class EspacoVazio {
     public EspacoVazio(){
         try {
             this.file = new RandomAccessFile(filePath,"rw");
-            this.file.writeInt(0);
-            this.file.writeLong(0);
+            if(this.file.length() == 0){
+                this.file.writeInt(0);
+            }
+
             this.file.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -43,17 +45,22 @@ public class EspacoVazio {
         long offSetEspacoVazio = 0;
         int qtdOffsets= -1;
         try {
-            file = new RandomAccessFile(filePath,"r");
+            this.file = new RandomAccessFile(filePath,"r");
             file2 = new RandomAccessFile(filePath + ".temp","rw");
-            qtdOffsets = file.readInt();
-            offSetEspacoVazio = file.readLong();
-            if(qtdOffsets -1 == 0){//n tem mais espacos vazios, por algum motivo '-'
-                file2.writeInt(qtdOffsets + 1);
+            qtdOffsets = this.file.readInt();
+
+            if(qtdOffsets == 0){
                 bTree.seek(bTree.length());
+                offSetEspacoVazio = bTree.getFilePointer();
+                file2.writeInt(2);
+                bTree.seek(bTree.length() + 68); // mudar para 4076
+                System.out.println("Escrevi o offset  " + bTree.getFilePointer());
                 file2.writeLong(bTree.getFilePointer());
-                bTree.seek(bTree.length() + 4076);// odeio constantes, mas n tem oq fazer
+                bTree.seek(bTree.length() + 68*2); // mudar para 4076
+                System.out.println("Escrevi o offset  " + bTree.getFilePointer());
                 file2.writeLong(bTree.getFilePointer());
-            }else{
+            } else{
+                offSetEspacoVazio = this.file.readLong();
                 file2.writeInt((qtdOffsets -1));
                 for(int i =0;i<qtdOffsets - 1;i++){
                     file2.writeLong(file.readLong());
