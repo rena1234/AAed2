@@ -50,7 +50,6 @@ public class ArvoreBMais {
                 return null;
             }else{
                 long offset = this.getRaizFile().readLong();
-                System.out.println("offset da raiz " + offset);
                 p = Pagina.lePagina(offset,this.getFile(),this.getOrdem());
             }
         } catch (IOException e) {
@@ -67,7 +66,6 @@ public class ArvoreBMais {
             auxiliar.setOffset(offset,0);
             auxiliar.setTamanho(1);
             long offsetEcrita = this.ferramenta1.buscaEspacoVazio(this.getFile());
-            System.out.println("primeiro offset "+ offsetEcrita );
             auxiliar.setOffsetPag(offsetEcrita);
             this.setRaiz(auxiliar);
             try {
@@ -77,14 +75,8 @@ public class ArvoreBMais {
                 e.printStackTrace();
             }
             Pagina.escrevePagina(this.getFile(),auxiliar,this.getOrdem());
-             try {
-                 System.out.println("Tamanho do arquivo: "+this.getFile().length());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
         }else{//raiz ja existe começo a buscar a pagina folha onde inseir
-            System.out.println("raiz : " + this.getRaiz().getChave(0));
             buscaInserir(auxiliar,chave,offset);
         }
 
@@ -106,7 +98,7 @@ public class ArvoreBMais {
                 meio = (esquerda + direita)/2;
                 if(p.getChave(meio) == chave){
                     // achei chave vou para a pagina
-                    System.out.println("Chave ja existe na arvore !!!!!");
+                    System.out.println("Chave " + chave +  " ja existe na arvore !!!!!");
                     return;
                 }
                 if(p.getChave(meio) < chave){
@@ -143,24 +135,25 @@ public class ArvoreBMais {
 
         }else{
             if(chave < p.getChave(0)){
-                System.out.println("pagina aux");
                 Pagina aux = Pagina.lePagina(p.getOffset(0),this.getFile(),this.getOrdem());
                 buscaInserir(aux,chave,offset);
             }else{
                 int meio = 0;
-                while(esquerda <= direita){
+                esquerda = 0;
+                direita = p.getTamanho() -1;
+                while(esquerda < direita){
                     meio = (esquerda + direita)/2;
                     if(p.getChave(meio) == chave){
                         // achei chave vou para a pagina
-                        Pagina aux = Pagina.lePagina(p.getOffset(meio + 1),this.getFile(),this.getOrdem());
-                    }
-                    if(p.getChave(meio) < chave){
+                        Pagina aux = Pagina.lePagina(p.getOffset(meio +1),this.getFile(),this.getOrdem());
+                        buscaInserir(aux,chave,offset);
+                    }else if(p.getChave(meio) < chave){
                         esquerda = meio +1;
                     }else{
                         direita = meio -1;
                     }
                  }
-                Pagina aux = Pagina.lePagina(p.getOffset(meio + 1),this.getFile(),this.getOrdem());
+                Pagina aux = Pagina.lePagina(p.getOffset(meio +1),this.getFile(),this.getOrdem());
                 buscaInserir(aux,chave,offset);
 
 
@@ -169,9 +162,7 @@ public class ArvoreBMais {
         }
     }
 
-
     private void split(Pagina p, int ordem, RandomAccessFile file){
-        System.out.println("zsplit!");
         //ATENCAO COLOCAR ENCADEAMENTO NOS NO FOLHA, ESQUECI ASS: GABRIEL DO PRESENTE Q AGR É PASSADO
         int metade = p.getTamanho()/2,metadeIrma;
         if(p.getTamanho() % 2 == 0){// par
@@ -179,6 +170,8 @@ public class ArvoreBMais {
         }else{//impar
             metadeIrma = metade +1;
         }
+
+
         long offsetListaEncadeada = p.getOffset(p.getTamanho());
         int chaveCentral = p.getChave(metade);
         Pagina irma = new Pagina(ordem);
@@ -192,7 +185,7 @@ public class ArvoreBMais {
             //copia metade ate 2*d para a pagina irma
             for(int i = metade;i<=irma.getTamanho();i++){
                 irma.setChave(p.getChave(i),aux);
-                p.setChave(-1,i);//zerei as chaves
+                p.setChave(0,i);//zerei as chaves
                 irma.setOffset(p.getOffset(i),aux);
                 p.setOffset(-1,i);//zerei os offsets
                 aux += 1;
@@ -207,22 +200,24 @@ public class ArvoreBMais {
                 pai.setOffsetPai(-1);
                 long offsetPagPai,offsetPagIrma;
                 offsetPagPai = ferramenta1.buscaEspacoVazio(file);
+                pai.setOffsetPag(offsetPagPai);
+                Pagina.escrevePagina(file,pai,this.getOrdem());
+
                 offsetPagIrma = ferramenta1.buscaEspacoVazio(file);
-                System.out.println("offsets pai e irma: " + offsetPagPai + " " + offsetPagIrma);
+                p.setOffsetPai(offsetPagPai);
+                p.setOffset(offsetPagIrma,p.getTamanho());// encadeamento esse offset aponta pra pag irma
+                pai.setOffset(p.getOffsetPag(),0);
+                pai.setOffset(offsetPagIrma,1);
+
+                irma.setOffsetPag(offsetPagIrma);
+                irma.setOffsetPai(offsetPagPai);
+                this.setRaiz(pai);
                 try {
                     this.getRaizFile().seek(0);
                     this.getRaizFile().writeLong(offsetPagPai);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                p.setOffsetPai(offsetPagPai);
-                p.setOffset(offsetPagIrma,p.getTamanho());// encadeamento esse offset aponta pra pag irma
-                pai.setOffset(p.getOffsetPag(),0);
-                pai.setOffset(offsetPagIrma,1);
-                pai.setOffsetPag(offsetPagPai);
-                irma.setOffsetPag(offsetPagIrma);
-                irma.setOffsetPai(offsetPagPai);
-                this.setRaiz(pai);
                 Pagina.escrevePagina(file,pai,this.getOrdem());
                 Pagina.escrevePagina(file,p,this.getOrdem());
                 Pagina.escrevePagina(file,irma,this.getOrdem());
@@ -230,7 +225,6 @@ public class ArvoreBMais {
             }else{//Pagina ja tem um pai entao vou inserir o no central nele e atualizar os ponteiros
                 long offsetPagIrma;
                 offsetPagIrma = ferramenta1.buscaEspacoVazio(file);
-                System.out.println("offset irma: " + offsetPagIrma);
                 irma.setOffsetPai(p.getOffsetPai());
                 irma.setOffsetPag(offsetPagIrma);
                 p.setOffset(offsetPagIrma,metade);
@@ -238,14 +232,26 @@ public class ArvoreBMais {
                 Pagina.escrevePagina(file,p,this.getOrdem());
                 Pagina.escrevePagina(file,irma,this.getOrdem());
                 pai = Pagina.lePagina(p.getOffsetPai(),file,this.getOrdem());// carrego pai na memoria
-                this.inserePaiSplit(pai,chaveCentral,irma.getOffsetPag());
-                if(this.getRaiz().getOffsetPag() == pai.getOffsetPag()){
-                    this.setRaiz(pai);// update na raiz runtime
-                }
-                Pagina.escrevePagina(file,pai,this.getOrdem());
+                pai = this.inserePaiSplit(pai,chaveCentral,irma.getOffsetPag());
                 if(pai.getTamanho() - 1 == this.getOrdem()*2){
                     split(pai,this.getOrdem(),file);//split pode se propagar entao eh recursivo
+                }else{
+                    Pagina.escrevePagina(file,pai,this.getOrdem());
+                    if(this.getRaiz().getOffsetPag() == pai.getOffsetPag()){
+                        this.setRaiz(pai);// update na raiz runtime
+                        try {
+                            this.getRaizFile().seek(0);
+                            this.getRaizFile().writeLong(pai.getOffsetPag());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
                 }
+
+
+
+
 
             }
 
@@ -253,14 +259,12 @@ public class ArvoreBMais {
 
         }else{// split em uma pagina do index set
             irma.setTamanho(metadeIrma); //como nao eh folha copia da metade + 1 em diante
-            System.out.println("cheguei aqui");
             p.setTamanho(metade);
             int i,aux = 0;
             p.setChave(-1,metade);//zerei a chave
             //p.setOffset(-1,metade +1);//zerei o offset
             //copia metade +1 ate 2*d para a pagina irma
             for(i = metade +1 ;i<=irma.getTamanho();i++){
-                System.out.println("iii rapaz olha o :" + p.getChave(i));
                 irma.setChave(p.getChave(i),aux);
                 p.setChave(-1,i);//zerei as chaves
                 irma.setOffset(p.getOffset(i),aux);
@@ -276,16 +280,19 @@ public class ArvoreBMais {
                 pai.setEh_folha(0);
                 pai.setTamanho(1);
                 pai.setChave(chaveCentral,0);
-                System.out.println("A chave central eh: " + chaveCentral);
                 pai.setOffset(p.getOffsetPag(),0);
                 long offsetPagPai,offsetPagIrma;
                 offsetPagPai = ferramenta1.buscaEspacoVazio(file);
+                pai.setOffsetPag(offsetPagPai);
+                Pagina.escrevePagina(file,pai,this.getOrdem());
                 offsetPagIrma = ferramenta1.buscaEspacoVazio(file);
+
 
                 try {
                     this.getRaizFile().seek(0);
                     this.getRaizFile().writeLong(offsetPagPai);
                 } catch (IOException e) {
+
                     e.printStackTrace();
                 }
                 p.setOffsetPai(offsetPagPai);
@@ -293,7 +300,7 @@ public class ArvoreBMais {
                 pai.setOffsetPag(offsetPagPai);
                 irma.setOffsetPag(offsetPagIrma);
                 irma.setOffsetPai(offsetPagPai);
-                this.setRaiz(pai);
+                this.setRaiz(pai);//atualizo raiz
                 Pagina.escrevePagina(file,pai,this.getOrdem());
                 Pagina.escrevePagina(file,p,this.getOrdem());
                 Pagina.escrevePagina(file,irma,this.getOrdem());
@@ -304,26 +311,31 @@ public class ArvoreBMais {
                 irma.setOffsetPag(offsetPagIrma);
                 p.setOffset(offsetPagIrma,metade +1);
                 pai = Pagina.lePagina(p.getOffsetPai(),file,this.getOrdem());// carrego pai na memoria
-                this.inserePaiSplit(pai,chaveCentral,irma.getOffsetPag());
-                if(this.getRaiz().getOffsetPag() == pai.getOffsetPag()){
-                    this.setRaiz(pai);// update na raiz
-                }
-                Pagina.escrevePagina(file,pai,this.getOrdem());
+                pai = this.inserePaiSplit(pai,chaveCentral,irma.getOffsetPag());
+                Pagina.escrevePagina(file,p,this.getOrdem());
+                Pagina.escrevePagina(file,irma,this.getOrdem());
                 if(pai.getTamanho() - 1 == this.getOrdem()*2){
                     split(pai,this.getOrdem(),file);//split pode se propagar entao eh recursivo
+                }else{
+                    Pagina.escrevePagina(file,pai,this.getOrdem());
+                    if(this.getRaiz().getOffsetPag() == pai.getOffsetPag()){
+                        this.setRaiz(pai);// update na raiz
+                    }
                 }
+
+
+
             }
 
         }
     }
 
-    private void inserePaiSplit(Pagina pai, int chave, long offset){
+    private Pagina inserePaiSplit(Pagina pai, int chave, long offset){
         int tempChave;
         long tempOffset;
         pai.setChave(chave,pai.getTamanho());
         pai.setTamanho(pai.getTamanho() + 1);
         pai.setOffset(offset,pai.getTamanho());
-        System.out.println("to inserindo o : " + chave);
         for(int pos = pai.getTamanho()-1;pos>0;pos--){
             if(pai.getChave(pos)<pai.getChave(pos - 1)){
                 tempChave = pai.getChave(pos);
@@ -334,10 +346,12 @@ public class ArvoreBMais {
                 pai.setChave(tempChave,pos-1);
                 pai.setOffset(tempOffset,pos);
 
+            }else{
+                break;
             }
 
-
         }
+        return pai;
     }
 
     public void printaArvore(Pagina p){
@@ -347,6 +361,8 @@ public class ArvoreBMais {
                 System.out.println("chave " +p.getChave(i));
                 System.out.println("offset " + p.getOffset(i));
             }
+            System.out.println("Meu tamaho eh: " + p.getTamanho());
+            System.out.println("meu offset eh: " + p.getOffsetPag());
             System.out.println("----------------------");
             if(p.getOffset(i) != -1){
                 Pagina p1 = null;
@@ -361,9 +377,11 @@ public class ArvoreBMais {
                 System.out.println("offsetee " + p.getOffset(i));
             }
             System.out.println("offsetee " + p.getOffset(i));
+            System.out.println("Meu offset eh: " + p.getOffsetPag());
+            System.out.println("Meu tamaho eh: " + p.getTamanho());
             System.out.println("----------------------");
             Pagina p1 = null;
-            p1 = Pagina.lePagina(p.getOffset(1),this.getFile(),this.getOrdem());
+            p1 = Pagina.lePagina(p.getOffset(0),this.getFile(),this.getOrdem());
             printaArvore(p1);
         }
 
