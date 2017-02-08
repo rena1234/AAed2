@@ -94,7 +94,7 @@ public class ArvoreBMais {
         int esquerda= 0, direita = p.getTamanho() -1;
         if(p.getEh_folha() == 1){// encontrei pagina folha para inseir
             int meio = 0;
-            while(esquerda < direita){
+            while(esquerda <= direita){
                 meio = (esquerda + direita)/2;
                 if(p.getChave(meio) == chave){
                     // achei chave vou para a pagina
@@ -141,7 +141,7 @@ public class ArvoreBMais {
                 int meio = 0;
                 esquerda = 0;
                 direita = p.getTamanho() -1;
-                while(esquerda < direita){
+                while(esquerda <= direita){
                     meio = (esquerda + direita)/2;
                     if(p.getChave(meio) == chave){
                         // achei chave vou para a pagina
@@ -153,8 +153,14 @@ public class ArvoreBMais {
                         direita = meio -1;
                     }
                  }
-                Pagina aux = Pagina.lePagina(p.getOffset(meio +1),this.getFile(),this.getOrdem());
-                buscaInserir(aux,chave,offset);
+                if(p.getChave(meio) > chave){//desco pelo offset do meio
+                    Pagina aux = Pagina.lePagina(p.getOffset(meio),this.getFile(),this.getOrdem());
+                    buscaInserir(aux,chave,offset);
+                }else{
+                    Pagina aux = Pagina.lePagina(p.getOffset(meio +1),this.getFile(),this.getOrdem());
+                    buscaInserir(aux,chave,offset);
+                }
+
 
 
             }//nao encontrei chave no index set, vou para a pagina de baixo
