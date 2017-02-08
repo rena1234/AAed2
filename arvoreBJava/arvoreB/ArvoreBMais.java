@@ -94,7 +94,7 @@ public class ArvoreBMais {
         int esquerda= 0, direita = p.getTamanho() -1;
         if(p.getEh_folha() == 1){// encontrei pagina folha para inseir
             int meio = 0;
-            while(esquerda <= direita){
+            while(esquerda < direita){
                 meio = (esquerda + direita)/2;
                 if(p.getChave(meio) == chave){
                     // achei chave vou para a pagina
@@ -165,12 +165,7 @@ public class ArvoreBMais {
     private void split(Pagina p, int ordem, RandomAccessFile file){
         //ATENCAO COLOCAR ENCADEAMENTO NOS NO FOLHA, ESQUECI ASS: GABRIEL DO PRESENTE Q AGR É PASSADO
         int metade = p.getTamanho()/2,metadeIrma;
-        if(p.getTamanho() % 2 == 0){// par
-            metadeIrma = metade;
-        }else{//impar
             metadeIrma = metade +1;
-        }
-
 
         long offsetListaEncadeada = p.getOffset(p.getTamanho());
         int chaveCentral = p.getChave(metade);
@@ -181,16 +176,15 @@ public class ArvoreBMais {
         if(p.getEh_folha() == 1){// a pagina eh folha entao eu preciso manter os registros no split
             int aux = 0;
             irma.setTamanho(metadeIrma);
-            p.setTamanho(metade);
             //copia metade ate 2*d para a pagina irma
-            for(int i = metade;i<=irma.getTamanho();i++){
+            for(int i = metade;i<p.getTamanho();i++){
                 irma.setChave(p.getChave(i),aux);
                 p.setChave(0,i);//zerei as chaves
                 irma.setOffset(p.getOffset(i),aux);
                 p.setOffset(-1,i);//zerei os offsets
                 aux += 1;
             }
-
+            p.setTamanho(metade);
 
             if(p.getOffsetPai() == -1){// Se for -1 preciso criar a pagina pai, q vai ser a nova raiz :o
                 pai = new Pagina(ordem);
@@ -259,18 +253,19 @@ public class ArvoreBMais {
 
         }else{// split em uma pagina do index set
             irma.setTamanho(metadeIrma); //como nao eh folha copia da metade + 1 em diante
-            p.setTamanho(metade);
+
             int i,aux = 0;
             p.setChave(-1,metade);//zerei a chave
             //p.setOffset(-1,metade +1);//zerei o offset
             //copia metade +1 ate 2*d para a pagina irma
-            for(i = metade +1 ;i<=irma.getTamanho();i++){
+            for(i = metade +1 ;i<p.getTamanho();i++){
                 irma.setChave(p.getChave(i),aux);
                 p.setChave(-1,i);//zerei as chaves
                 irma.setOffset(p.getOffset(i),aux);
                 p.setOffset(-1,i);//zerei os offsets
                 aux += 1;
             }
+            p.setTamanho(metade);
             irma.setOffset(p.getOffset(i),aux);//irma agora tem tamanho + 1 offsets
             p.setOffset(-1,i);
             irma.setTamanho(metadeIrma -1);
