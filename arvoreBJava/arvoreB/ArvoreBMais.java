@@ -486,10 +486,8 @@ public class ArvoreBMais {
                                     pai.setOffset(pai.getOffset(j+2),j+1);
                                 }
                                 pai.setTamanho(pai.getTamanho() -1);
-                                System.out.println("Tamanho do pai: " + pai.getTamanho());
                                 if(pai.getOffsetPag() == this.getRaiz().getOffsetPag()){
                                     this.setRaiz(pai); // atualizo runtime
-                                    System.out.println("nao sou o pai!");
                                 }
 
                                 concatencao(pai,p,irmaDireita,'d',chavePai);
@@ -756,10 +754,8 @@ public class ArvoreBMais {
                 this.setRaiz(pai);
                 Pagina.escrevePagina(this.getFile(),pai,this.getOrdem());
             }else if(pai.getTamanho() < this.getOrdem() && pai.getOffsetPag() != this.getRaiz().getOffsetPag()){
-                System.out.println("oooo o gaaaas");
                 //pagina do index set feriu ordem e n eh raiz
                 Pagina paiDoPai = Pagina.lePagina(pai.getOffsetPai(),this.getFile(),this.getOrdem());
-                System.out.println("pai do pai");
                 // preciso descobrir quem eh a chave pai da pagina folha e suas irmas
                 int meio = 0,
                 esquerda = 0, direita = paiDoPai.getTamanho() -1;
@@ -799,7 +795,6 @@ public class ArvoreBMais {
 
                     }else{// preciso concatenar
                         int j = 0;
-                        System.out.println("to aqui oh");
                         int chavePaidoPai = paiDoPai.getChave(meio);
                         for(j = meio; j < pai.getTamanho() -1; j++){
                             paiDoPai.setChave(paiDoPai.getChave(j+1),j);
@@ -851,7 +846,6 @@ public class ArvoreBMais {
                         Pagina.escrevePagina(this.getFile(),irmaEsquerda,this.getOrdem());
                     } else if(irmaDireita.getTamanho() - 1 >= this.getOrdem()){
                         redistribuicao(pai,irmaDireita,'d',paiDoPai,meio);
-                        System.out.println("to aqui :D");
                         if(paiDoPai.getOffsetPag() == this.getRaiz().getOffsetPag()){
                             this.setRaiz(paiDoPai);//atualizo raiz runtime
                         }
@@ -859,10 +853,8 @@ public class ArvoreBMais {
                         Pagina.escrevePagina(this.getFile(),paiDoPai,this.getOrdem());
                         Pagina.escrevePagina(this.getFile(),irmaDireita,this.getOrdem());
                     }else{
-                        System.out.println("iiii rapaz concatenacao");
                         int j = 0;
                         int chavePaidoPai = paiDoPai.getChave(meio);
-                        System.out.println("Chave do pai do maluco " + chavePaidoPai);
                         for(j = meio; j < paiDoPai.getTamanho() -1; j++){
                             paiDoPai.setChave(paiDoPai.getChave(j+1),j);
                             paiDoPai.setOffset(paiDoPai.getOffset(j+2),j+1);
@@ -957,7 +949,6 @@ public class ArvoreBMais {
                             int j = 0;
                             int chavePaidoPai = paiDoPai.getChave(meio);
                             for(j = meio; j < paiDoPai.getTamanho() -1; j++){
-                                System.out.println("papaaaai chave 0" + paiDoPai.getChave(j+1));
                                 paiDoPai.setChave(paiDoPai.getChave(j+1),j);
                                 paiDoPai.setOffset(paiDoPai.getOffset(j+2),j+1);
                             }
@@ -966,7 +957,6 @@ public class ArvoreBMais {
                             paiDoPai.setTamanho(paiDoPai.getTamanho() -1);
                             if(paiDoPai.getOffsetPag() == this.getRaiz().getOffsetPag()){
                                 this.setRaiz(paiDoPai); // atualizo runtime
-                                System.out.println("runtime q vc respeita");
                             }
                             concatencao(paiDoPai,pai,irmaDireita,'d',chavePaidoPai);
                         }
