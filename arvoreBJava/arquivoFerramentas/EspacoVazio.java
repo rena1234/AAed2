@@ -53,9 +53,9 @@ public class EspacoVazio {
                 bTree.seek(bTree.length());
                 offSetEspacoVazio = bTree.getFilePointer();
                 file2.writeInt(2);
-                bTree.seek(bTree.length() + 68); // mudar para 4076
+                bTree.seek(bTree.length() + 4062); // mudar para 4076
                 file2.writeLong(bTree.getFilePointer());
-                bTree.seek(bTree.length() + 68*2); // mudar para 4076
+                bTree.seek(bTree.length() + 4062*2); // mudar para 4076
                 file2.writeLong(bTree.getFilePointer());
             } else{
                 offSetEspacoVazio = this.file.readLong();
