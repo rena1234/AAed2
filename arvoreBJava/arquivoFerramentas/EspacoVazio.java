@@ -12,11 +12,7 @@ public class EspacoVazio {
     public EspacoVazio(){
         try {
             this.file = new RandomAccessFile(filePath,"rw");
-            if(this.file.length() == 0){
-                this.file.writeInt(0);
-            }
 
-            this.file.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -26,13 +22,8 @@ public class EspacoVazio {
     }
     public void escreveOffsetEspVazio(long offset){
         try {
-            file = new RandomAccessFile(filePath,"rw");
-            int qtdOffsets = file.readInt();
-            file.seek(file.length());
-            file.writeLong(offset);
-            file.seek(0);
-            file.writeInt(qtdOffsets + 1);
-            this.file.close();
+            this.file.seek(this.file.length());
+            this.file.writeLong(offset);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -41,37 +32,18 @@ public class EspacoVazio {
 
     }
     public long buscaEspacoVazio(RandomAccessFile bTree){
-        RandomAccessFile file2;
         long offSetEspacoVazio = 0;
-        int qtdOffsets= -1;
         try {
-            this.file = new RandomAccessFile(filePath,"r");
-            file2 = new RandomAccessFile(filePath + ".temp","rw");
-            qtdOffsets = this.file.readInt();
 
-            if(qtdOffsets == 0){
+            if(this.file.length() == 0){
                 bTree.seek(bTree.length());
                 offSetEspacoVazio = bTree.getFilePointer();
-                file2.writeInt(2);
-                bTree.seek(bTree.length() + 4062); // mudar para 4076
-                file2.writeLong(bTree.getFilePointer());
-                bTree.seek(bTree.length() + 4062*2); // mudar para 4076
-                file2.writeLong(bTree.getFilePointer());
+                this.file.writeLong(bTree.length() + 4062*2);
+                this.file.writeLong(bTree.length() + 4062);
             } else{
+                this.file.seek( this.file.length() - Long.SIZE/Byte.SIZE);
                 offSetEspacoVazio = this.file.readLong();
-                file2.writeInt((qtdOffsets -1));
-                for(int i =0;i<qtdOffsets - 1;i++){
-                    file2.writeLong(file.readLong());
-                }
-            }
-
-            file.close();
-            file2.close();
-            File file1 = new File(filePath);
-            File fileTemp = new File(filePath+ ".temp");
-            boolean successful = fileTemp.renameTo(file1);
-            if(successful == false){
-                System.out.println("Deu ruim lesk!");
+                this.file.setLength( this.file.length() - Long.SIZE/Byte.SIZE );
             }
 
 
