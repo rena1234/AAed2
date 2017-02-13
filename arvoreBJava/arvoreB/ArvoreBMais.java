@@ -16,7 +16,7 @@ public class ArvoreBMais {
     private  RandomAccessFile raizFile;
     private int ordem;
     private  EspacoVazio ferramenta1;
-    private String filePathRaiz = "raiz.bin";
+    private String filePathRaiz = "arquivos/raiz.bin";
 
 
     public ArvoreBMais(String filePath,int ordem){
@@ -24,15 +24,13 @@ public class ArvoreBMais {
         this.setOrdem(ordem);
         try{
             this.file = new RandomAccessFile(filePath,"rw");
-            this.raizFile = new RandomAccessFile("raiz.bin","rw");
+            this.raizFile = new RandomAccessFile("arquivos/raiz.bin","rw");
 
         }catch(IOException e ){
             System.err.print("Nao foi possivel abrir o arquivo");
             e.printStackTrace();
         }
         this.setRaiz(this.leRaiz());
-        //System.out.println(this.getRaiz().getChave(0));
-
     }
 
     public RandomAccessFile getRaizFile() {
@@ -57,6 +55,35 @@ public class ArvoreBMais {
             e.printStackTrace();
         }
         return p;
+
+    }
+    public void bsucaSequencia(long chave){
+        Pagina raiz = this.getRaiz();
+        int i;
+        for( i = 0; i <raiz.getTamanho();i++){
+            if(raiz.getChave(i) == chave){
+                System.out.println("acheeei");
+                return;
+            }
+        }
+        if(raiz.getOffset(i) != -1){
+            Pagina p = Pagina.lePagina(raiz.getOffset(i),this.getFile(),this.getOrdem());
+            buscaSequencialaux(p, chave);
+        }
+
+    }
+    private void buscaSequencialaux(Pagina p, long chave){
+        int i;
+        for( i = 0; i <p.getTamanho();i++){
+            if(p.getChave(i) == chave){
+                System.out.println("acheeei");
+                return;
+            }
+        }
+        if(p.getOffset(i) != -1){
+            Pagina p1 = Pagina.lePagina(p.getOffset(i),this.getFile(),this.getOrdem());
+            buscaSequencialaux(p1, chave);
+        }
 
     }
     public void inserirArvore(long chave, long offset){
@@ -838,13 +865,13 @@ public class ArvoreBMais {
                 }else{// tenho as duas irmas
                     Pagina irmaDireita = Pagina.lePagina(paiDoPai.getOffset(posOffset + 1),this.getFile(),this.getOrdem());
                     Pagina irmaEsquerda = Pagina.lePagina(paiDoPai.getOffset(posOffset -1),this.getFile(),this.getOrdem());
-
+                    System.out.println("paizao tem as duas");
                     if(irmaEsquerda.getTamanho() -1 >= this.getOrdem()){//verifico se posso remover
-                        paiDoPai.setChave(irmaEsquerda.getChave(irmaEsquerda.getTamanho() -1),meio);
                         redistribuicao(pai,irmaEsquerda,'e',paiDoPai,meio);
                         if(paiDoPai.getOffsetPag() == this.getRaiz().getOffsetPag()){
                             this.setRaiz(paiDoPai);//atualizo raiz runtime
                         }
+                        System.out.println("to aqui");
                         Pagina.escrevePagina(this.getFile(),pai,this.getOrdem());
                         Pagina.escrevePagina(this.getFile(),paiDoPai,this.getOrdem());
                         Pagina.escrevePagina(this.getFile(),irmaEsquerda,this.getOrdem());
@@ -1215,7 +1242,7 @@ public class ArvoreBMais {
             System.out.println("Meu pai eh: " + p.getOffsetPai());
             System.out.println("----------------------");
             Pagina p1 = null;
-            p1 = Pagina.lePagina(p.getOffset(2),this.getFile(),this.getOrdem());
+            p1 = Pagina.lePagina(p.getOffset(0),this.getFile(),this.getOrdem());
             printaArvore(p1);
         }
 

@@ -44,21 +44,6 @@ public class Pagina  implements  Serializable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        /*try {
-            file.seek(p.getOffsetPag());
-            file.writeLong(p.getOffsetPag());
-            file.writeLong(p.getOffsetPai());
-            file.writeInt(p.getTamanho());
-            file.writeInt(p.getEh_folha());
-            for(int i = 0;i<2*ordem +1;i++){
-                file.writeLong(p.getChave(i));
-            }
-            for(int i = 0;i< 2*ordem + 2;i++){
-                file.writeLong(p.getOffset(i));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
     public static Pagina lePagina(long offset, RandomAccessFile file,int ordem){
         Pagina p = null;
@@ -83,24 +68,6 @@ public class Pagina  implements  Serializable{
             e.printStackTrace();
         }
         return p;
-        /*Pagina p = new Pagina(ordem);
-        try {
-            file.seek(offset);
-            p.setOffsetPag(file.readLong());
-            p.setOffsetPai(file.readLong());
-            p.setTamanho(file.readInt());
-            p.setEh_folha(file.readInt());
-            for(int i = 0;i<(2*ordem) +1;i++){
-                p.setChave(file.readLong(),i);
-            }
-            for(int i = 0;i<(2*ordem) +2;i++){
-                p.setOffset(file.readLong(),i);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return p;*/
     }
 
 
