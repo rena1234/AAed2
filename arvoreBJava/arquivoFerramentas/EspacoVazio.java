@@ -7,7 +7,7 @@ import java.util.RandomAccess;
  * Created by gabriel on 30/01/17.
  */
 public class EspacoVazio {
-    private String filePath = "espacos.bin";
+    private String filePath = "arquivos/espacos.bin";
     private  RandomAccessFile file;
     public EspacoVazio(){
         try {

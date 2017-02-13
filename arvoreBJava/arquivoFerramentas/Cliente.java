@@ -2,10 +2,8 @@ package arquivoFerramentas;
 
 import arvoreB.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.util.StringTokenizer;
 
 /**
@@ -70,6 +68,21 @@ public class Cliente{
         }else{
             System.out.println("CPF ja existe na base de dados");
         }
+    }
+    public static void removerRegistro(RandomAccessFile file, long cpf, ArvoreBMais arv){
+        long offset;
+        if((offset =arv.buscaOffsetChave(cpf)) != -1){
+            try {
+                file.seek(offset);
+                String cpfString = "000.000.000-00";
+                byte [] cpfBytes = cpfString.getBytes();
+                file.write(cpfBytes);
+                arv.removeChave(cpf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
     public static  Cliente leRegistro(RandomAccessFile file, long offset){
         Cliente c = new Cliente();
