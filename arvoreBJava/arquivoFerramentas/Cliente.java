@@ -37,7 +37,6 @@ public class Cliente{
         long cpfNum = Long.parseLong(cpf2);
             try {
                 file.seek(file.length());
-                arv.inserirArvore(cpfNum,file.getFilePointer());
                 byte[] cpf = this.getCpf().getBytes();
                 file.write(cpf);
                 file.writeChar('\t');
