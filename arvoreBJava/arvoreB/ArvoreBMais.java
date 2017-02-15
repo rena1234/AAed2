@@ -865,11 +865,13 @@ public class ArvoreBMais {
                 }else{// tenho as duas irmas
                     Pagina irmaDireita = Pagina.lePagina(paiDoPai.getOffset(posOffset + 1),this.getFile(),this.getOrdem());
                     Pagina irmaEsquerda = Pagina.lePagina(paiDoPai.getOffset(posOffset -1),this.getFile(),this.getOrdem());
+                    System.out.println("paizao tem as duas");
                     if(irmaEsquerda.getTamanho() -1 >= this.getOrdem()){//verifico se posso remover
                         redistribuicao(pai,irmaEsquerda,'e',paiDoPai,meio);
                         if(paiDoPai.getOffsetPag() == this.getRaiz().getOffsetPag()){
                             this.setRaiz(paiDoPai);//atualizo raiz runtime
                         }
+                        System.out.println("to aqui");
                         Pagina.escrevePagina(this.getFile(),pai,this.getOrdem());
                         Pagina.escrevePagina(this.getFile(),paiDoPai,this.getOrdem());
                         Pagina.escrevePagina(this.getFile(),irmaEsquerda,this.getOrdem());
@@ -1211,14 +1213,16 @@ public class ArvoreBMais {
         }
 
     }
-    public void printaFolhas(Pagina p){
+    public void printaArvore(Pagina p){
         if(p.getEh_folha() == 1){
             int i;
             for(i = 0; i < p.getTamanho();i++){
                 System.out.println("chave " +p.getChave(i));
                 System.out.println("offset " + p.getOffset(i));
             }
-            System.out.println("Meu tamanho eh: " + p.getTamanho());
+            System.out.println("Meu tamaho eh: " + p.getTamanho());
+            System.out.println("meu offset eh: " + p.getOffsetPag());
+            System.out.println("Meu pai eh: " + p.getOffsetPai());
             System.out.println("----------------------");
             if(p.getOffset(i) != -1){
                 Pagina p1 = null;
@@ -1235,6 +1239,7 @@ public class ArvoreBMais {
             System.out.println("offsetee " + p.getOffset(i));
             System.out.println("Meu offset eh: " + p.getOffsetPag());
             System.out.println("Meu tamaho eh: " + p.getTamanho());
+            System.out.println("Meu pai eh: " + p.getOffsetPai());
             System.out.println("----------------------");
             Pagina p1 = null;
             p1 = Pagina.lePagina(p.getOffset(0),this.getFile(),this.getOrdem());
