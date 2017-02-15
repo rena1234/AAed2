@@ -33,11 +33,11 @@ public class Cliente{
     }
     public void escreveRegistro(RandomAccessFile file, ArvoreBMais arv,HashTable hash){
         //Escrevo registro no arquivo bin
+        // ja verifiquei previamente que o registro nao existe no arquivo!
         // precio instanciar um novo cliente pegando as informaçes pelo console e dps escrevo ele
         String cpf1 = this.getCpf();
         String cpf2= cpf1.replaceAll("[\\D]","");
         long cpfNum = Long.parseLong(cpf2);
-        if(arv.buscaOffsetChave(cpfNum) == -1) {//chave nao existe posso inserir
             try {
                 file.seek(file.length());
                 arv.inserirArvore(cpfNum,file.getFilePointer());
@@ -68,9 +68,6 @@ public class Cliente{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else{
-            System.out.println("CPF ja existe na base de dados!");
-        }
     }
     public static void removerRegistro(RandomAccessFile file, long cpf, ArvoreBMais arv,HashTable hash){
         long offset;
