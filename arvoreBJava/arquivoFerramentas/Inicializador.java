@@ -1,6 +1,7 @@
 package arquivoFerramentas;
 
 import arvoreB.ArvoreBMais;
+import hash.HashTable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,7 +44,8 @@ public class Inicializador {
         }
         return  offset;
     }
-    public static void geraIndices(RandomAccessFile file1, ArvoreBMais arv){
+    public static void geraIndices(RandomAccessFile file1, ArvoreBMais arv,
+            HashTable hash){
         try {
             file1.seek(0);
             while(file1.getFilePointer() != file1.length()){
@@ -54,6 +56,8 @@ public class Inicializador {
                     String cpf1= cpf.replaceAll("[\\D]","");
                     long cpfNum = Long.parseLong(cpf1);
                     arv.inserirArvore(cpfNum,offset);
+                    hash.insere(cpfNum,offset);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
