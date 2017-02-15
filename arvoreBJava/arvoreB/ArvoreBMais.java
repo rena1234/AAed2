@@ -57,35 +57,7 @@ public class ArvoreBMais {
         return p;
 
     }
-    public void bsucaSequencia(long chave){
-        Pagina raiz = this.getRaiz();
-        int i;
-        for( i = 0; i <raiz.getTamanho();i++){
-            if(raiz.getChave(i) == chave){
-                System.out.println("acheeei");
-                return;
-            }
-        }
-        if(raiz.getOffset(i) != -1){
-            Pagina p = Pagina.lePagina(raiz.getOffset(i),this.getFile(),this.getOrdem());
-            buscaSequencialaux(p, chave);
-        }
 
-    }
-    private void buscaSequencialaux(Pagina p, long chave){
-        int i;
-        for( i = 0; i <p.getTamanho();i++){
-            if(p.getChave(i) == chave){
-                System.out.println("acheeei");
-                return;
-            }
-        }
-        if(p.getOffset(i) != -1){
-            Pagina p1 = Pagina.lePagina(p.getOffset(i),this.getFile(),this.getOrdem());
-            buscaSequencialaux(p1, chave);
-        }
-
-    }
     public void inserirArvore(long chave, long offset){
         Pagina auxiliar = this.getRaiz();
         if(auxiliar == null){// nao existe raiz, arvore vazia
