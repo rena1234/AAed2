@@ -31,12 +31,17 @@ public class Cliente{
         this.setTelefone(telefone);
         this.setNum_compras(num_compras);
     }
-    public void escreveRegistro(RandomAccessFile file){
+    public void escreveRegistro(RandomAccessFile file, ArvoreBMais arv,HashTable hash){
+        //Escrevo registro no arquivo bin
+        // precio instanciar um novo cliente pegando as informaçes pelo console e dps escrevo ele
         String cpf1 = this.getCpf();
         String cpf2= cpf1.replaceAll("[\\D]","");
         long cpfNum = Long.parseLong(cpf2);
+        if(arv.buscaOffsetChave(cpfNum) == -1) {//chave nao existe posso inserir
             try {
                 file.seek(file.length());
+                arv.inserirArvore(cpfNum,file.getFilePointer());
+                hash.insere(cpfNum,file.getFilePointer());
                 byte[] cpf = this.getCpf().getBytes();
                 file.write(cpf);
                 file.writeChar('\t');
@@ -63,16 +68,26 @@ public class Cliente{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }else{
+            System.out.println("CPF ja existe na base de dados!");
+        }
     }
-    public static void removerRegistro(RandomAccessFile file, long offset){
+    public static void removerRegistro(RandomAccessFile file, long cpf, ArvoreBMais arv,HashTable hash){
+        long offset;
+        if((offset =arv.buscaOffsetChave(cpf)) != -1){
             try {
                 file.seek(offset);
                 String cpfString = "000.000.000-00";
                 byte [] cpfBytes = cpfString.getBytes();
                 file.write(cpfBytes);
+                arv.removeChave(cpf);
+                hash.delete(cpf);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }else{
+             System.out.println("CPF não existe na base de dados!");
+        }
 
     }
     public static  Cliente leRegistro(RandomAccessFile file, long offset){
