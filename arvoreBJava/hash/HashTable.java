@@ -24,11 +24,12 @@ public class HashTable{
     private long offsetAtual;
     private long chave;
 
-    public HashTable(long tamanhoHash)throws FileNotFoundException{
+    public HashTable(long tamanhoHash)throws IOException{
         this.tamanho = tamanhoHash;
         this.arqLists = new RandomAccessFile("arqLists","rw");
         this.arqEspVazio = new RandomAccessFile("arqEspVazio","rw");
         this.arqHash = new RandomAccessFile("arqHash","rw");
+        this.iniciaHash();
     }    
 
     private void escreveNoArquivo  (long offsetDestino,long offsetAnterior,
@@ -61,11 +62,7 @@ public class HashTable{
         this.offsetRegistro = arqLists.readLong();
         this.offsetProx = arqLists.readLong();*/
         
-        /*
-         * IMPORTANTE
-         * Tem que fzr um teste para saber quantos bytes são aqui 
-         */
-        byte [] bytes = new byte[4062];
+        byte [] bytes = new byte[59];
         
         try {
             this.arqLists.seek(offset);
@@ -75,11 +72,6 @@ public class HashTable{
         }
         try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
             try(ObjectInputStream o = new ObjectInputStream(b)){
-                /*
-                 * IMPORTANTE
-                 * Testa essa merda também
-                 * vvvvvvvvvvvvvvvvvvvvvvv
-                 */
                  long[] infoNo = (long[])o.readObject();
                  this.offsetAtual = offset;
                  this.offsetAnterior = infoNo[0];
@@ -128,6 +120,7 @@ public class HashTable{
                 return this.offsetRegistro;
             if(this.offsetProx == -1)
                 return -1;
+            moveCabeca(this.offsetProx);
         }
     }
 
@@ -135,12 +128,8 @@ public class HashTable{
         
         long offsetNoNovo = -1; /* Esse -1 está aí só pra iniciar a variável */
         long offsetInicioLista = this.achaInicioLista(chave);
-        this.arqLists.seek(offsetInicioLista);
+        //this.arqLists.seek(offsetInicioLista);
         
-        if(arqHash.length() == 0){
-            this.iniciaHash();
-        }
-
         boolean podeInserir = true;
 
         if(this.buscaRegistro(chave) != -1){
@@ -175,7 +164,7 @@ public class HashTable{
          * offIniLis == -1 representa lista não iniciada
          */
         if(offsetInicioLista == -1 && podeInserir){
-            arqHash.seek(offsetInicioLista);
+            arqHash.seek((chave % this.tamanho)*(Long.SIZE/Byte.SIZE));
             arqHash.writeLong(offsetNoNovo);
             this.escreveNoArquivo(offsetNoNovo,-1,chave,offsetRegistro,-1);
         }
@@ -197,11 +186,18 @@ public class HashTable{
             this.escreveNoArquivo(offsetNoNovo,this.offsetAtual,chave,offsetRegistro,
                     this.offsetProx);
             /*
-             * Atualiza o nó atual
+             * Atualiza o nó atual e o próximo nó do atual
              */
+            long aux = this.offsetProx;
             this.escreveNoArquivo(this.offsetAtual,this.offsetAnterior,this.chave,
                     this.offsetRegistro,offsetNoNovo);
+            if(aux != -1){
+                this.moveCabeca(aux);
+                this.escreveNoArquivo(this.offsetAtual,offsetNoNovo,this.chave,
+                        this.offsetRegistro,this.offsetProx);
+            }
         }
+        
     }
 
     /*
@@ -220,9 +216,8 @@ public class HashTable{
         if(offsetInicioLista != -1){
             this.moveCabeca(offsetInicioLista);
             while(true){
-                if(this.offsetProx == -1) break;
                 if(this.chave == chave){
-                    if(this.offsetAnterior == -1 && this.offsetProx == 1){
+                    if(this.offsetAnterior == -1 && this.offsetProx == -1){
                         escreveNoArquivo(this.offsetAtual,-1,-1,-1,-1);
                         break;
                     }
@@ -248,6 +243,7 @@ public class HashTable{
                             this.chave,this.offsetRegistro,aux);
                     break;
                 }
+                if(this.offsetProx == -1) break;
                 avanca();
             }   
         } 

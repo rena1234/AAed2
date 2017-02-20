@@ -11,31 +11,25 @@ public class Controle{
 
     public static void insere(ArvoreBMais arv, HashTable hash){
 
-        /*Em algum lugar tem ou vai ter uma classe/método que
-         * escreve o registro em arqBinario( arq do orleans em bin )
-         * e retorna o offset aonde o registro está.
-         */
-        long offsetRegistro;  /* Recebe o offset em que o registro foi
-        *colocado ver comentário acima
-        */ 
+        //long offsetRegistro; 
 
         long chave;
         boolean retardo = false;
         Scanner scan = new Scanner(System.in);
         do{
             if(retardo)
-                System.out.println("Digite uma chave válida");
+                System.out.println("Digite um cpf válido");
             
-            System.out.println("Digite a chave a ser inserida");
+            System.out.println("Digite o cpf");
             chave = scan.nextLong();
             if (chave < 0) retardo = true;
             else retardo = false;
         }
         while(retardo);
-        
+        System.out.println("Digite o nome"); 
+        String nome =
         try{
-            hash.insere(chave,offsetRegistro);
-            arv.inserirArvore(chave,offsetRegistro);
+
         }
         catch(IOException e){
             e.printStackTrace();
