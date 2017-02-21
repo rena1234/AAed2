@@ -1,5 +1,3 @@
-
-
 package hash;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +13,7 @@ public class HashTable{
     private RandomAccessFile arqLists;
     private RandomAccessFile arqEspVazio;
     private RandomAccessFile arqHash;
-    
+
     private long tamanho;
 
     private long offsetAnterior;
@@ -26,32 +24,32 @@ public class HashTable{
 
     public HashTable(long tamanhoHash)throws IOException{
         this.tamanho = tamanhoHash;
-        this.arqLists = new RandomAccessFile("arqLists","rw");
-        this.arqEspVazio = new RandomAccessFile("arqEspVazio","rw");
-        this.arqHash = new RandomAccessFile("arqHash","rw");
+        this.arqLists = new RandomAccessFile("arquivos/arqLists","rw");
+        this.arqEspVazio = new RandomAccessFile("arquivos/arqEspVazio","rw");
+        this.arqHash = new RandomAccessFile("arquivos/arqHash","rw");
         this.iniciaHash();
-    }    
+    }
 
     private void escreveNoArquivo  (long offsetDestino,long offsetAnterior,
-            long chave,long offsetRegistro, long offsetProx)throws IOException{
+                                    long chave,long offsetRegistro, long offsetProx)throws IOException{
         /*arqLists.seek(offsetDestino);
         arqLists.writeLong(offsetAnterior);
         arqLists.writeLong(chave);
         arqLists.writeLong(offsetRegistro);
         arqLists.writeLong(offsetProx);*/
         long[] arrayNo = new long[4];
-        arrayNo[0] = offsetAnterior; arrayNo[1] = chave; 
+        arrayNo[0] = offsetAnterior; arrayNo[1] = chave;
         arrayNo[2] = offsetRegistro; arrayNo[3] = offsetProx;
-        
+
         try(ByteArrayOutputStream b = new ByteArrayOutputStream()) {
             try (ObjectOutputStream o = new ObjectOutputStream(b)) {
                 o.writeObject(arrayNo);
             }
             arqLists.seek(offsetDestino);
             arqLists.write(b.toByteArray());
-         } catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-          }
+        }
     }
 
     private void moveCabeca(long offset)throws IOException{
@@ -61,9 +59,9 @@ public class HashTable{
         this.chave = arqLists.readInt();
         this.offsetRegistro = arqLists.readLong();
         this.offsetProx = arqLists.readLong();*/
-        
+
         byte [] bytes = new byte[59];
-        
+
         try {
             this.arqLists.seek(offset);
             this.arqLists.read(bytes);
@@ -72,12 +70,12 @@ public class HashTable{
         }
         try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
             try(ObjectInputStream o = new ObjectInputStream(b)){
-                 long[] infoNo = (long[])o.readObject();
-                 this.offsetAtual = offset;
-                 this.offsetAnterior = infoNo[0];
-                 this.chave = infoNo[1];
-                 this.offsetRegistro = infoNo[2];
-                 this.offsetProx = infoNo[3];
+                long[] infoNo = (long[])o.readObject();
+                this.offsetAtual = offset;
+                this.offsetAnterior = infoNo[0];
+                this.chave = infoNo[1];
+                this.offsetRegistro = infoNo[2];
+                this.offsetProx = infoNo[3];
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -107,7 +105,7 @@ public class HashTable{
 
     private long achaInicioLista(long chave)throws IOException{
         arqHash.seek((chave % this.tamanho)*(Long.SIZE/Byte.SIZE));
-        return arqHash.readLong(); 
+        return arqHash.readLong();
     }
 
     public long buscaRegistro(long chave)throws IOException{
@@ -125,11 +123,11 @@ public class HashTable{
     }
 
     public void insere(long chave,long offsetRegistro)throws IOException{
-        
+
         long offsetNoNovo = -1; /* Esse -1 está aí só pra iniciar a variável */
         long offsetInicioLista = this.achaInicioLista(chave);
         //this.arqLists.seek(offsetInicioLista);
-        
+
         boolean podeInserir = true;
 
         if(this.buscaRegistro(chave) != -1){
@@ -151,7 +149,7 @@ public class HashTable{
             arqEspVazio.setLength( arqEspVazio.length() - Long.SIZE/Byte.SIZE );
             arqLists.seek(offsetNoNovo);
         }
-        
+
         /*
          * Coloca file pointer no final do arquivo
          */
@@ -159,7 +157,7 @@ public class HashTable{
             offsetNoNovo = arqLists.length();
             arqLists.seek(offsetNoNovo);
         }
-        
+
         /*
          * offIniLis == -1 representa lista não iniciada
          */
@@ -197,19 +195,19 @@ public class HashTable{
                         this.offsetRegistro,this.offsetProx);
             }
         }
-        
+
     }
 
     /*
      * Caso o nó retirado possua:
-     *  
+     *
      *  offsetAnterior == -1 && offsetProx == -1
      *
      * então, o nó ao primeiro offset da lista deve receber
      * a chave == -1, indicando uma lista vazia
      *
      * Todo nó excluido deve ser sobrescrito por um "nó nulo"
-     * (todos os atributos == -1) 
+     * (todos os atributos == -1)
      */
     public void delete(long chave)throws IOException{
         long offsetInicioLista = achaInicioLista(chave);
@@ -221,7 +219,7 @@ public class HashTable{
                         escreveNoArquivo(this.offsetAtual,-1,-1,-1,-1);
                         break;
                     }
-                    
+
                     /*
                      * Passa segundo elemento para primeira posição
                      */
@@ -236,7 +234,7 @@ public class HashTable{
                     }
                     arqEspVazio.seek(arqEspVazio.length());
                     arqEspVazio.writeLong(this.offsetAtual);
-                    
+
                     long aux = this.offsetProx;
                     this.retrocede();
                     this.escreveNoArquivo(this.offsetAtual,this.offsetAnterior,
@@ -245,9 +243,8 @@ public class HashTable{
                 }
                 if(this.offsetProx == -1) break;
                 avanca();
-            }   
-        } 
+            }
+        }
     }
 
 }
-
