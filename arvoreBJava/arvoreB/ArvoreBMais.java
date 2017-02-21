@@ -16,7 +16,6 @@ public class ArvoreBMais {
     private  RandomAccessFile raizFile;
     private int ordem;
     private  EspacoVazio ferramenta1;
-    private String filePathRaiz = "arquivos/raiz.bin";
 
 
     public ArvoreBMais(String filePath,int ordem){
@@ -24,7 +23,7 @@ public class ArvoreBMais {
         this.setOrdem(ordem);
         try{
             this.file = new RandomAccessFile(filePath,"rw");
-            this.raizFile = new RandomAccessFile("arquivos/raiz.bin","rw");
+            this.raizFile = new RandomAccessFile("arquivos/raiz","rw");
 
         }catch(IOException e ){
             System.err.print("Nao foi possivel abrir o arquivo");
@@ -149,7 +148,7 @@ public class ArvoreBMais {
                 meio = (esquerda + direita)/2;
                 if(p.getChave(meio) == chave){
                     // achei chave vou para a pagina
-                    System.out.println("Chave " + chave +  " ja existe na arvore !!!!!");
+                    System.out.println("Chave " + chave +  " ja existe!!!!!");
                     return;
                 }
                 if(p.getChave(meio) < chave){
@@ -837,13 +836,11 @@ public class ArvoreBMais {
                 }else{// tenho as duas irmas
                     Pagina irmaDireita = Pagina.lePagina(paiDoPai.getOffset(posOffset + 1),this.getFile(),this.getOrdem());
                     Pagina irmaEsquerda = Pagina.lePagina(paiDoPai.getOffset(posOffset -1),this.getFile(),this.getOrdem());
-                    System.out.println("paizao tem as duas");
                     if(irmaEsquerda.getTamanho() -1 >= this.getOrdem()){//verifico se posso remover
                         redistribuicao(pai,irmaEsquerda,'e',paiDoPai,meio);
                         if(paiDoPai.getOffsetPag() == this.getRaiz().getOffsetPag()){
                             this.setRaiz(paiDoPai);//atualizo raiz runtime
                         }
-                        System.out.println("to aqui");
                         Pagina.escrevePagina(this.getFile(),pai,this.getOrdem());
                         Pagina.escrevePagina(this.getFile(),paiDoPai,this.getOrdem());
                         Pagina.escrevePagina(this.getFile(),irmaEsquerda,this.getOrdem());
