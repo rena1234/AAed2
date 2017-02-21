@@ -1,6 +1,7 @@
 package arquivoFerramentas;
 
 import arvoreB.*;
+import hash.HashTable;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -38,38 +39,38 @@ public class Cliente{
         String cpf1 = this.getCpf();
         String cpf2= cpf1.replaceAll("[\\D]","");
         long cpfNum = Long.parseLong(cpf2);
-            try {
-                file.seek(file.length());
-                arv.inserirArvore(cpfNum,file.getFilePointer());
-                hash.insere(cpfNum,file.getFilePointer());
-                byte[] cpf = this.getCpf().getBytes();
-                file.write(cpf);
-                file.writeChar('\t');
-                byte[] nome = this.getNome().getBytes();
-                file.write(nome);
-                file.writeChar('\t');
-                byte[] endereco = this.getEndereco().getBytes();
-                file.write(endereco);
-                file.writeChar('\t');
-                byte[] email = this.getEmail().getBytes();
-                file.write(email);
-                file.writeChar('\t');
-                byte[] data_nascimento = this.getData_nascimento().getBytes();
-                file.write(data_nascimento);
-                file.writeChar('\t');
-                byte[] telefone = this.getTelefone().getBytes();
-                file.write(telefone);
-                file.writeChar('\t');
-                String num = Integer.toString(this.getNum_compras());
-                byte[] num1 = num.getBytes();
-                file.write(num1);
-                file.writeChar('\n');
+        try {
+            file.seek(file.length());
+            arv.inserirArvore(cpfNum,file.getFilePointer());
+            hash.insere(cpfNum,file.getFilePointer());
+            byte[] cpf = this.getCpf().getBytes();
+            file.write(cpf);
+            file.writeChar('\t');
+            byte[] nome = this.getNome().getBytes();
+            file.write(nome);
+            file.writeChar('\t');
+            byte[] endereco = this.getEndereco().getBytes();
+            file.write(endereco);
+            file.writeChar('\t');
+            byte[] email = this.getEmail().getBytes();
+            file.write(email);
+            file.writeChar('\t');
+            byte[] data_nascimento = this.getData_nascimento().getBytes();
+            file.write(data_nascimento);
+            file.writeChar('\t');
+            byte[] telefone = this.getTelefone().getBytes();
+            file.write(telefone);
+            file.writeChar('\t');
+            String num = Integer.toString(this.getNum_compras());
+            byte[] num1 = num.getBytes();
+            file.write(num1);
+            file.writeChar('\n');
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public static void removerRegistro(RandomAccessFile file, long cpf, ArvoreBMais arv,HashTable hash){
+    public static void removerRegistro(RandomAccessFile file, long cpf, ArvoreBMais arv, HashTable hash){
         long offset;
         if((offset =arv.buscaOffsetChave(cpf)) != -1){
             try {
@@ -83,7 +84,7 @@ public class Cliente{
                 e.printStackTrace();
             }
         }else{
-             System.out.println("CPF não existe na base de dados!");
+            System.out.println("CPF não existe na base de dados!");
         }
 
     }
@@ -101,7 +102,7 @@ public class Cliente{
             c.setData_nascimento(registro.nextToken());
             c.setTelefone(registro.nextToken());
             String num = registro.nextToken();
-            c.setNum_compras(Integer.parseInt(num));
+            c.setNum_compras(Integer.parseInt(num.trim()));
 
         } catch (IOException e) {
             e.printStackTrace();
