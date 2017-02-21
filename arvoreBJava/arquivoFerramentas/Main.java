@@ -45,7 +45,8 @@ public class Main{
             System.out.println("1 para inserção");
             System.out.println("2 para busca");
             System.out.println("3 para remoção");
-            System.out.println("4 para sair");
+            System.out.println("4 para comparar desempenho de busca");
+            System.out.println("5 para sair");
             System.out.print("Opção: ");
             opt = scan.nextInt();
             switch(opt){
@@ -55,7 +56,10 @@ public class Main{
                     break;
                 case 3: Controle.remove(arv,hash,arqBinario);
                     break;
-                case 4: sair = true;
+                case 4: Controle.comparaDesempenho(arv,hash,arqBinario);
+                    break;
+                case 5: sair = true;
+                    break;
                 default: System.out.println("Digite uma opção válida");
 
             }

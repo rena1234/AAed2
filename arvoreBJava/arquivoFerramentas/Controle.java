@@ -185,5 +185,43 @@ public class Controle{
         Cliente.removerRegistro(file,chave,arv,hash);
 
     }
+    public static void comparaDesempenho(ArvoreBMais arv,HashTable hash ,RandomAccessFile file){
+        String chaveString;
+        long chave = 0;
+        boolean retardo = false;
+        Scanner scan = new Scanner(System.in);
+        do{
+            if(retardo)
+                System.out.println("Digite uma chave válida");
+
+            System.out.print("Digite a chave a ser buscada: ");
+            chaveString = scan.nextLine();
+            if (chaveString.length() <= 0) retardo = true;
+            else if(chaveString.length() >14) retardo = true;
+            else retardo = false;
+        }
+        while(retardo);
+        String cpf2= chaveString.replaceAll("[\\D]","");
+        chave = Long.parseLong(cpf2);
+
+        long start = System.currentTimeMillis();
+        Inicializador.buscaSequencial(file,chave);
+        long end = System.currentTimeMillis();
+        System.out.println("Tempo em segundos busca sequencial: " + (double)((end - start) / 1000.0));
+
+        start = System.currentTimeMillis();
+        arv.buscaOffsetChave(chave);
+        end = System.currentTimeMillis();
+        System.out.println("Tempo em segundos busca árvore B+: " + (double)((end - start) / 1000.0));
+
+        start = System.currentTimeMillis();
+        try {
+            hash.buscaRegistro(chave);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        end = System.currentTimeMillis();
+        System.out.println("Tempo em segundos busca HashTable: " + (double)((end - start) / 1000.0));
+    }
 
 }
